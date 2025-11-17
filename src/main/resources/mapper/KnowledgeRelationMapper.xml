@@ -26,6 +26,11 @@
         DELETE FROM KnowledgeRelations WHERE relation_id = #{relationId}
     </delete>
 
+    <delete id="deleteRelationsByKpId" parameterType="int">
+        DELETE FROM KnowledgeRelations
+        WHERE source_kp_id = #{kpId} OR target_kp_id = #{kpId}
+    </delete>
+
     <select id="findRelationById" parameterType="int" resultMap="KnowledgeRelationResultMap">
         SELECT * FROM KnowledgeRelations WHERE relation_id = #{relationId}
     </select>

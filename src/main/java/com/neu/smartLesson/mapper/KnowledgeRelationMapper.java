@@ -36,4 +36,10 @@ public interface KnowledgeRelationMapper {
      * @return 边列表
      */
     List<KnowledgeRelation> findRelationsByCourseId(@Param("courseId") Integer courseId);
+
+    /**
+     * 当一个知识点 (节点) 被删除时，级联删除所有相关的“边”
+     * @param kpId 知识点ID
+     */
+    void deleteRelationsByKpId(@Param("kpId") Integer kpId);
 }

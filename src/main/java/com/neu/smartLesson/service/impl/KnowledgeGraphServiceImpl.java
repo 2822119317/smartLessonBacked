@@ -4,6 +4,7 @@ import com.neu.smartLesson.dto.CreateRelationRequestDto;
 import com.neu.smartLesson.dto.GraphDto;
 import com.neu.smartLesson.dto.KnowledgePointDto;
 import com.neu.smartLesson.dto.RelationResponseDto;
+import com.neu.smartLesson.exception.RegistrationException;
 import com.neu.smartLesson.exception.ResourceNotFoundException;
 import com.neu.smartLesson.exception.UnauthorizedException;
 import com.neu.smartLesson.mapper.*;
@@ -75,12 +76,12 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         // 查找知识点并鉴权
         checkKnowledgePointOwnership(kpId, teacherId);
 
-        // (V2.0: 在删除节点前，我们应该先删除所有与它相关的“边” (Relations))
-        // (R1.0: 我们先实现基础删除)
+        // 在删除“节点”之前，必须先删除所有连接到它的“边”
+        // System.out.println("正在级联删除 KpId: " + kpId + " 的相关“边”...");
+        krMapper.deleteRelationsByKpId(kpId);
 
-        // 删除数据库中的知识点
+        // 删除“节点”
         kpMapper.deleteKnowledgePointById(kpId);
-
     }
 
 
@@ -92,10 +93,17 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
         checkCourseOwnership(courseId, teacherId);
 
         // 检查源节点和目标节点都属于此课程
-        checkKnowledgePointOwnership(dto.getSourceKpId(), teacherId);
-        checkKnowledgePointOwnership(dto.getTargetKpId(), teacherId);
+        KnowledgePoint sourceKp = checkKnowledgePointOwnership(dto.getSourceKpId(), teacherId);
+        KnowledgePoint targetKp = checkKnowledgePointOwnership(dto.getTargetKpId(), teacherId);
 
-        // (V2.0: 还应检查 source 和 target 是否属于同一个 courseId, 暂 R1.0 忽略)
+        // 确保源节点和目标节点都属于同一个课程
+        if (!Objects.equals(sourceKp.getCourseId(), targetKp.getCourseId())) {
+            throw new RegistrationException("错误：源节点和目标节点不属于同一个课程。");
+        }
+        // 并且它们都属于我们正在操作的这个 courseId
+        if (!Objects.equals(sourceKp.getCourseId(), courseId)) {
+            throw new RegistrationException("错误：这些知识点不属于您正在操作的课程 (ID: " + courseId + ")");
+        }
 
         // DTO -> Model
         KnowledgeRelation relation = KnowledgeRelation.builder()
