@@ -6,9 +6,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-/**
- * 课程 (Courses) 表的 MyBatis Mapper 接口
- */
 @Mapper
 public interface CourseMapper {
 
