@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.smartLesson.mapper.QuestionOptionMapper">
+
+    <insert id="insertBatchOptions">
+        INSERT INTO QuestionOptions (question_id, option_text, is_correct)
+        VALUES
+        <foreach collection="options" item="option" separator=",">
+            (#{option.questionId}, #{option.optionText}, #{option.isCorrect})
+        </foreach>
+    </insert>
+
+    <delete id="deleteOptionsByQuestionId" parameterType="int">
+        DELETE FROM QuestionOptions WHERE question_id = #{questionId}
+    </delete>
+
+    <select id="findOptionsByQuestionId" parameterType="int"
+            resultType="com.neu.smartLesson.model.QuestionOption">
+        SELECT * FROM QuestionOptions WHERE question_id = #{questionId}
+    </select>
+</mapper>

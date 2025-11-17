@@ -6,6 +6,7 @@ import com.neu.smartLesson.dto.KnowledgePointDto;
 import com.neu.smartLesson.dto.RelationResponseDto;
 import com.neu.smartLesson.exception.RegistrationException;
 import com.neu.smartLesson.exception.ResourceNotFoundException;
+import com.neu.smartLesson.exception.UnauthorizedException;
 import com.neu.smartLesson.mapper.*;
 import com.neu.smartLesson.model.Course;
 import com.neu.smartLesson.model.KnowledgePoint;
@@ -151,6 +152,25 @@ public class KnowledgeGraphServiceImpl implements KnowledgeGraphService {
                 .nodes(kDtoMapper.toDtoList(nodes))
                 .edges(krDtoMapper.toDtoList(edges))
                 .build();
+    }
+
+    /**
+     * 【新增 - 模块间辅助】
+     */
+    @Override
+    public void checkKnowledgePointsExist(List<Integer> kpIds, Integer courseId) {
+        if (kpIds == null || kpIds.isEmpty()) {
+            throw new RegistrationException("知识点列表不能为空。");
+        }
+
+        for (Integer kpId : kpIds) {
+            KnowledgePoint kp = kpMapper.findKnowledgePointById(kpId)
+                    .orElseThrow(() -> new ResourceNotFoundException("知识点 (ID: " + kpId + ") 未找到。"));
+
+            if (!Objects.equals(kp.getCourseId(), courseId)) {
+                throw new UnauthorizedException("知识点 (ID: " + kpId + ") 不属于此课程 (ID: " + courseId + ")。");
+            }
+        }
     }
 
     /**

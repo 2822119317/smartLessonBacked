@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.neu.smartLesson.mapper.QuestionMapper">
+
+    <resultMap id="QuestionResultMap" type="com.neu.smartLesson.model.Question">
+        <id property="questionId" column="question_id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="creatorId" column="creator_id"/>
+        <result property="supportsAiGrading" column="supports_ai_grading"/>
+        <result property="questionType" column="question_type" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+        <result property="difficulty" column="difficulty" typeHandler="org.apache.ibatis.type.EnumTypeHandler"/>
+    </resultMap>
+
+    <insert id="insertQuestion" parameterType="com.neu.smartLesson.model.Question"
+            useGeneratedKeys="true" keyProperty="questionId">
+        INSERT INTO Questions (course_id, prompt, question_type, difficulty, supports_ai_grading, creator_id)
+        VALUES (
+                   #{courseId}, #{prompt},
+                   #{questionType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                   #{difficulty, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+                   #{supportsAiGrading}, #{creatorId}
+               )
+    </insert>
+
+    <update id="updateQuestion" parameterType="com.neu.smartLesson.model.Question">
+        UPDATE Questions
+        SET
+            prompt = #{prompt},
+            question_type = #{questionType, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            difficulty = #{difficulty, typeHandler=org.apache.ibatis.type.EnumTypeHandler},
+            supports_ai_grading = #{supportsAiGrading}
+        WHERE question_id = #{questionId}
+    </update>
+
+    <delete id="deleteQuestionById" parameterType="int">
+        DELETE FROM Questions WHERE question_id = #{questionId}
+    </delete>
+
+    <select id="findQuestionById" parameterType="int" resultMap="QuestionResultMap">
+        SELECT * FROM Questions WHERE question_id = #{questionId}
+    </select>
+
+    <select id="findQuestionsByCourseId" parameterType="int" resultMap="QuestionResultMap">
+        SELECT * FROM Questions WHERE course_id = #{courseId} ORDER BY question_id
+    </select>
+</mapper>

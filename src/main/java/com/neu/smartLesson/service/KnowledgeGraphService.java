@@ -5,6 +5,8 @@ import com.neu.smartLesson.dto.GraphDto;
 import com.neu.smartLesson.dto.KnowledgePointDto;
 import com.neu.smartLesson.dto.RelationResponseDto;
 
+import java.util.List;
+
 public interface KnowledgeGraphService {
 
     // 节点 (Nodes)
@@ -50,4 +52,11 @@ public interface KnowledgeGraphService {
      * 【新增】获取课程的完整图谱 (US-T09)
      */
     GraphDto getGraphForCourse(Integer courseId, Integer teacherId);
+
+    /**
+     * 检查一组 KnowledgePoint ID 是否都存在且属于特定课程
+     * @param kpIds 要检查的 ID 列表
+     * @param courseId 它们必须所属的课程 ID
+     */
+    void checkKnowledgePointsExist(List<Integer> kpIds, Integer courseId);
 }
